@@ -3,6 +3,8 @@ beautifulsoup4==4.12.2
 dj-database-url==2.0.0
 Django==4.2.4
 django-bootstrap-v5==1.0.11
+gunicorn==21.2.0
+packaging==23.1
 psycopg2-binary==2.9.6
 soupsieve==2.4.1
 sqlparse==0.4.4
