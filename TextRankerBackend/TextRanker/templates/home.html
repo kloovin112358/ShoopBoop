@@ -19,6 +19,9 @@
             <div>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTextModal">New Boop</button>
                 <a class="btn btn-info text-white mt-sm-0 mt-1" href="{% url 'Ranker:texts_list' %}"><i class="bi bi-arrow-clockwise"></i> Refresh</a>
+                <button class="btn btn-outline-secondary mt-md-0 mt-1" data-bs-toggle="modal" data-bs-target="#instructionModal">
+                    <i class="bi bi-question-circle-fill" style="font-size: 1 rem;" aria-label="Help"></i>
+                </button>
             </div>
             <div>
                 <div class="d-flex justify-content-end">
@@ -133,6 +136,29 @@
     </div>
 </div>
 
+<div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="instructionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="instructionModalLabel">What is Shoop Boop?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Hello! Welcome!<br><br>
+            Shoop Boop is somewhere between a social media site and a game. Here are some definitions:<br><br>
+            <div class="mb-3"><strong>Boop</strong> (<i>noun</i>): A text-based post on the site.<br></div>
+            <div class="mb-3"><strong>Shoop</strong> (<i>verb</i>): The submission of a boop. You can shoop as many boops as your heart desires.<br></div>
+            <div><strong>Foop</strong> (<i>noun, verb</i>): A point/vote, to submit a point/vote for a boop. You can only foop boops after completing a small puzzle. 
+            These puzzles make sure you care enough about a boop to foop it. They also keep the robots at bay.<br><br></div>
+            To start fooping boops, click the egg button on a boop. It's easy!
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+</div>
+
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 10000">
     <div id="foopAddedToast" class="toast hide shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
@@ -141,7 +167,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        <span class="text-success">Nice! Your boop was fooped!</span> Foop again, if you like.
+        <span class="text-success">Nice! Your boop was fooped! Foop again, if you like.
       </div>
     </div>
   </div>
@@ -153,6 +179,43 @@
 <script src="{% static 'infinite.min.js' %}"></script>
 
 <script>
+function createCookie(name, value, days) {
+    var expires;
+
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    } else {
+        expires = "";
+    }
+    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = encodeURIComponent(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ')
+            c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0)
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name, "", -1);
+}
+
+$(document).ready(function() {
+    if (!(readCookie('returningUser') == 'true')) {
+        createCookie('returningUser', 'true', '90')
+        $('#instructionModal').modal('show')
+    } 
+})
+
 $(document).keypress(function (e) {
  var key = e.which;
 
@@ -193,6 +256,7 @@ $(document).on('click', '.voteBtn', function() {
 
 var captcha = sliderCaptcha({
     id: 'captcha',
+    barText:'Foop the Boop!',
     onSuccess: function () {
         sendVote()
     },
