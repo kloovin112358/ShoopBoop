@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from detoxify import Detoxify
+
+# from detoxify import Detoxify
 
 
 class Boop(models.Model):
@@ -12,16 +13,16 @@ class Boop(models.Model):
     def __str__(self):
         return self.boop_text[0:30]
 
-    def clean(self):
-        toxicityRating = Detoxify("original").predict(self.boop_text)
-        if toxicityRating["toxicity"] > 0.5:
-            raise ValidationError(
-                "Error: this boop has not met the community standards for toxicity. Please reword your boop."
-            )
+    # def clean(self):
+    #     toxicityRating = Detoxify("original").predict(self.boop_text)
+    #     if toxicityRating["toxicity"] > 0.5:
+    #         raise ValidationError(
+    #             "Error: this boop has not met the community standards for toxicity. Please reword your boop."
+    #         )
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     self.full_clean()
+    #     return super().save(*args, **kwargs)
 
 
 class UserPOSTSubmission(models.Model):
