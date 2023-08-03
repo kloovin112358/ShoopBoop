@@ -18,18 +18,18 @@
           
             <div>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTextModal">Shoop Boop</button>
-                <a class="btn btn-info text-white mt-sm-0 mt-1" href="{% url 'Ranker:texts_list' %}"><i class="bi bi-arrow-clockwise"></i> Refresh</a>
-                <button class="btn btn-outline-secondary mt-md-0 mt-1" data-bs-toggle="modal" data-bs-target="#instructionModal">
+                <a class="btn btn-info text-white d-none d-md-inline-block" href="{% url 'Ranker:texts_list' %}"><i class="bi bi-arrow-clockwise"></i> Refresh</a>
+                <button class="btn btn-outline-secondary mt-sm-0 mt-1" data-bs-toggle="modal" data-bs-target="#instructionModal">
                     <i class="bi bi-question-circle-fill" style="font-size: 1 rem;" aria-label="Help"></i>
                 </button>
             </div>
             <div>
-                <div class="d-flex justify-content-end">
-                    <input class="form-control" placeholder="Search for a boop here" id="boopSearchInput" maxlength="140" {% if request.GET.q %}value="{{request.GET.q}}"{% endif %}>
+                <div class="d-flex justify-content-end flex-wrap">
+                    <input class="form-control" style="width:206.4px!important;" placeholder="Search for a boop here" id="boopSearchInput" maxlength="140" {% if request.GET.q %}value="{{request.GET.q}}"{% endif %}>
                     {% if request.GET.q %}
-                    <a class="btn btn-secondary ms-1" href="{% url 'Ranker:texts_list' %}">Clear</a>
+                    <a class="btn btn-secondary ms-1 mt-md-0 mt-1" href="{% url 'Ranker:texts_list' %}">Clear</a>
                     {% endif %}
-                    <button class="btn btn-dark ms-1" id="searchBtn">Search</button>
+                    <button class="btn btn-dark ms-1 mt-md-0 mt-1" id="searchBtn">Search</button>
                 </div>  
             </div>
             
