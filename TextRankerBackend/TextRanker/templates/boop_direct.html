@@ -1,0 +1,202 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block title %}
+  {{boop}}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="py-3 py-md-4">
+        <button class="btn btn-lg btn-outline-secondary mt-0 mt-lg-1 mb-2" id="allBoopsLink"><i class="bi bi-arrow-left"></i> All Boops</button>
+        <div class="card shadow-lg">
+            <div class="card-body m-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                    <h1 class="mb-0"><span class="badge rounded-pill bg-primary">{{boop.num_foops}} <span class="fw-normal">foops</span></span></h1>
+                    </div>
+                    <div>
+                        <h1 class="mb-0"><span class="badge {{rankColor}}">{{boopRank}}<span class="fw-normal"> out of</span> {{numBoops}}</span></h1>
+                    </div>
+                </div>
+                <hr>
+                <p class="display-4 mb-4 fw-bold lh-sm">"{{boop.boop_text}}"</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="lead fst-italic" style="font-size:2rem;">Shooped {{boop.creation_ts|date}}</span>
+                    <button class="btn btn-warning text-white voteBtn" boopText="{{boop.boop_text}}" foopNum="{{boop.num_foops}}">
+                        <i class="bi bi-egg-fill" style="font-size: 1 rem;"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-link" data-bs-toggle="tooltip" data-bs-placement="top" title="Copied!" id="copyBoopLinkBtn">Copy boop link</button>
+                    <button type="button" class="btn btn-link text-muted" data-bs-toggle="modal" data-bs-target="#reportBoopModal"><u>Report this boop</u></button>
+                </div>
+            </div>
+        </div>
+       
+        
+    </div>
+</div>
+
+<div class="modal fade" id="reportBoopModal" tabindex="-1" aria-labelledby="reportBoopModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="reportBoopModalLabel">Report this Boop</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div>
+                    <label for="boopTextInput" class="form-label">Report Reason</label>
+                    <textarea class="form-control" id="reportReasonText" rows="3" maxlength="500" placeholder="Please explain why you think this boop should be removed from the site."></textarea>
+                  </div>
+              </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="reportSubmitBtn">Submit</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content"> 
+        <div class="modal-header">
+            <h5 class="modal-title" id="voteModalLabel">Foop a Boop</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+            <span id="boopFoopPreText">
+            <p id="boopRefText" class="fst-italic lead mb-1"></p>
+            <p class="mb-3"><span id="foopRefText" class="fw-bold" style="font-size:1.6rem;"></span> foops</p>
+            </span>
+            <span class="d-none text-danger mb-4" id="foopWarningText">Error: you're sending foops too fast! Are you sure you're not a robot?</span>
+            <div id="captcha"></div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 10000">
+    <div id="foopAddedToast" class="toast hide shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Shoop Boop</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <span class="text-success">Nice! Your boop was fooped!</span> Foop again, if you like.
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="{% static 'image-puzzle-slider-captcha/src/disk/slidercaptcha.min.css' %}" rel="stylesheet" />
+<script src="{% static 'image-puzzle-slider-captcha/src/disk/longbow.slidercaptcha.min.js' %}"></script>
+
+<script>
+$('#copyBoopLinkBtn').on('click', function() {
+    copiedTooltip.enable()
+    copiedTooltip.show()
+    setTimeout(function() {
+        copiedTooltip.disable()
+     }, 800);
+    
+    boopLink="{{viewBoopLink}}"
+
+    var input = document.createElement('input');
+    input.setAttribute('value', boopLink);
+    document.body.appendChild(input);
+    input.select();
+    var result = document.execCommand('copy');
+    document.body.removeChild(input)
+    return result;
+})
+
+$('#reportSubmitBtn').on('click', function() {
+    $('#reportReasonText').removeClass('is-invalid')
+    if (!$('#reportReasonText').val()) {
+        $('#reportReasonText').addClass('is-invalid')
+    } else {
+        $.ajax({
+            url: "{% url 'Ranker:send_report' %}",
+            type: "POST",
+            data: {
+                'reportText': $('#reportReasonText').val(),
+                'boopId': "{{boop.id}}"
+            },
+            success: function() {
+                window.location.href = "{% url 'Ranker:texts_list' %}"
+            }, 
+            error: function() {
+                alert("An unexpected error occurred.")
+            }
+        })
+    }
+})
+
+var copiedTooltip = new bootstrap.Tooltip($('#copyBoopLinkBtn'))
+copiedTooltip.disable()
+
+// synthetic link that checks for homepage referrer. If the linking page was the homepage, we don't want 
+// to send the user to the full link; we want to simulate clicking the "back" button. This is because
+// of the background loading and scrolling on the homepage. We want them to keep their place on the page.
+$('#allBoopsLink').on('click', function() {
+    if (document.referrer == "{{homeLink}}") {
+        history.back();
+    } else {
+        window.location.href = "{% url 'Ranker:texts_list' %}"
+    }
+})
+
+var currentTextId = null;
+$(document).on('click', '.voteBtn', function() {
+    currentTextId = "{{boop.id}}"
+    $('#boopRefText').text($(this).attr('boopText'))
+    $('#foopRefText').text($(this).attr('foopNum'))
+    $('#voteModal').modal('show')
+})
+
+var captcha = sliderCaptcha({
+    id: 'captcha',
+    onSuccess: function () {
+        sendVote()
+    },
+}); 
+
+function sendVote() {
+    $('#foopWarningText').addClass('d-none')
+    $.ajax({
+        url: "{% url 'Ranker:send_vote' %}",
+        type: "POST",
+        data: {'textId': currentTextId},
+        success: function(data) {
+            $('#foopRefText').text(data.num_foops)
+            $('#foopAddedToast').toast('show')
+            setTimeout(function() {
+                captcha.reset()
+            }, 2000);
+        }, 
+        error: function(data) {
+            if (data.status == 400) {
+                $('#foopWarningText').removeClass('d-none')
+            } else {
+                alert('Oops! There was an error sending your foop! Refresh to try again!')
+            }
+        }
+    })
+}
+
+$('#voteModal').on('hide.bs.modal', function () {
+    location.reload()
+});
+
+</script>
+{% endblock %}
+

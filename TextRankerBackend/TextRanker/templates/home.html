@@ -1,0 +1,257 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block title %}
+  Shoop Boop
+{% endblock %}
+
+{% block content %}
+<style>
+.boopCard:hover {
+    background-color: #e6e6e6;
+}
+</style>
+<div class="container">
+    <div class="py-3 py-md-4">
+        {% if texts %}
+        <div class="d-flex justify-content-between mb-3 mb-md-4">
+          
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTextModal">New Boop</button>
+                <a class="btn btn-info text-white mt-sm-0 mt-1" href="{% url 'Ranker:texts_list' %}"><i class="bi bi-arrow-clockwise"></i> Refresh</a>
+            </div>
+            <div>
+                <div class="d-flex justify-content-end">
+                    <input class="form-control" placeholder="Search for a boop here" id="boopSearchInput" maxlength="140" {% if request.GET.q %}value="{{request.GET.q}}"{% endif %}>
+                    {% if request.GET.q %}
+                    <a class="btn btn-secondary ms-1" href="{% url 'Ranker:texts_list' %}">Clear</a>
+                    {% endif %}
+                    <button class="btn btn-dark ms-1" id="searchBtn">Search</button>
+                </div>  
+            </div>
+            
+        </div>
+        {% endif %}
+
+    
+    <div class="row infinite-container">
+        {% if texts %}
+        {% for post in texts %}
+            <div class="col-md-6 infinite-item">
+                <div class="card mb-2 mb-md-4 shadow-lg boopCard" style="cursor: pointer;" href="{% url 'Ranker:view_boop' boop_id=post.id %}">
+                    <div class="card-body py-0">
+                        
+                        <p class="card-text">
+                            <div class="mb-3" style="font-size:1.5rem;">{{post.boop_text}}</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="h2 numFoopCardDisplay" foopId="{{post.id}}" style="line-height: 1">{{post.num_foops}}</span> <span class="text-muted">foops</span>
+                                </div>        
+                                <div>
+                                    <button class="btn btn-sm btn-warning text-white voteBtn ignoreRedirect" entryId="{{post.id}}" boopText="{{post.boop_text}}" foopNum="{{post.num_foops}}">
+                                        <i class="bi bi-egg-fill ignoreRedirect" style="font-size: 1 rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                    <!-- <div class="card-footer py-0">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-sm btn-link"><u>Link</u></button>
+                            <button type="button" class="btn btn-sm btn-link text-muted"><u>Report</u></button>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center">
+        <i class="bi bi-emoji-frown" style="font-size:13rem;"></i>
+        {% if request.GET.q %}
+        <p class="display-6">Fooey. Your search for "{{request.GET.q}}" yielded no results.</p>
+        <a class='display-6' href="{% url 'Ranker:texts_list' %}">Go back home?</a>
+        {% else %}
+        <p class="display-6">Hmm... there doesn't seem to be anything here.</p>
+        {% endif %}
+        
+    </div>
+    {% endif %}
+    
+    <div class="loading" style="display: none;">
+        Loading...
+      </div>
+    
+      {% if page_obj.has_next %}
+        <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}">More</a>
+      {% endif %}
+    
+</div>
+
+<div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content"> 
+        <div class="modal-header">
+            <h5 class="modal-title" id="voteModalLabel">Foop a Boop</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+            <span id="boopFoopPreText">
+            <p id="boopRefText" class="fst-italic lead mb-1"></p>
+            <p class="mb-3"><span id="foopRefText" class="fw-bold" style="font-size:1.6rem;"></span> foops</p>
+            </span>
+            <span class="d-none text-danger mb-4" id="foopWarningText">Error: you're sending foops too fast! Are you sure you're not a robot?</span>
+            <div id="captcha"></div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newTextModal" tabindex="-1" aria-labelledby="newTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="newTextModalLabel">Shoop a Boop</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div>
+                    <label for="boopTextInput" class="form-label">Boop Text</label>
+                    <textarea class="form-control" id="boopTextInput" rows="3" maxlength="140" placeholder="Maximum of 140 characters."></textarea>
+                    <div class="invalid-feedback" id="boopTextErrorMsg">
+                        
+                    </div>
+                  </div>
+              </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="shoopBoopButton">Submit</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 10000">
+    <div id="foopAddedToast" class="toast hide shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Shoop Boop</strong>
+        <small>Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <span class="text-success">Nice! Your boop was fooped!</span> Foop again, if you like.
+      </div>
+    </div>
+  </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="{% static 'image-puzzle-slider-captcha/src/disk/slidercaptcha.min.css' %}" rel="stylesheet" />
+<script src="{% static 'image-puzzle-slider-captcha/src/disk/longbow.slidercaptcha.min.js' %}"></script>
+<script src="{% static 'jquery.waypoints.min.js' %}"></script>
+<script src="{% static 'infinite.min.js' %}"></script>
+
+<script>
+$(document).keypress(function (e) {
+ var key = e.which;
+
+ if(key == 13)  // the enter key code
+  {
+    if ($('#newTextModal').hasClass('show')) {
+        $('#shoopBoopButton').click()
+    } else {
+        $('#searchBtn').click();
+    }
+    return false;  
+  }
+}); 
+
+$(document).on('click', '.boopCard', function(event) {
+    if(!$(event.target).hasClass('ignoreRedirect')) {
+        window.location.href = $(this).attr('href')
+    }
+})
+
+var infinite = new Waypoint.Infinite({
+      element: $('.infinite-container')[0],
+      onBeforePageLoad: function () {
+        $('.loading').show();
+      },
+      onAfterPageLoad: function ($items) {
+        $('.loading').hide();
+      }
+    });
+
+var currentTextId = null;
+$(document).on('click', '.voteBtn', function() {
+    currentTextId = $(this).attr('entryId')
+    $('#boopRefText').text($(this).attr('boopText'))
+    $('#foopRefText').text($(this).attr('foopNum'))
+    $('#voteModal').modal('show')
+})
+
+var captcha = sliderCaptcha({
+    id: 'captcha',
+    onSuccess: function () {
+        sendVote()
+    },
+}); 
+
+function sendVote() {
+    $('#foopWarningText').addClass('d-none')
+    $.ajax({
+        url: "{% url 'Ranker:send_vote' %}",
+        type: "POST",
+        data: {'textId': currentTextId},
+        success: function(data) {
+            $('#foopRefText').text(data.num_foops)
+            $('.numFoopCardDisplay[foopId=' + currentTextId +']').text(data.num_foops)
+            $('#foopAddedToast').toast('show')
+            setTimeout(function() {
+                captcha.reset()
+            }, 2000);
+        }, 
+        error: function(data) {
+            if (data.status == 400) {
+                $('#foopWarningText').removeClass('d-none')
+            } else {
+                alert('Oops! There was an error sending your foop! Refresh to try again!')
+            }
+        }
+    })
+}
+
+$('#searchBtn').on('click', function() {
+    $('#boopSearchInput').removeClass('is-invalid')
+    // validate that something was searched
+    if (!$('#boopSearchInput').val()) {
+        $('#boopSearchInput').addClass('is-invalid')
+    } else {
+        window.location.href = "{% url 'Ranker:boop_search' %}?q=" + $('#boopSearchInput').val()
+    }
+})
+
+$('#shoopBoopButton').on('click', function() {
+    $('#boopTextInput').removeClass('is-invalid')
+    if (!$('#boopTextInput').val()) {
+        $('#boopTextInput').addClass('is-invalid')
+    } else {
+        $.ajax({
+            url: "{% url 'Ranker:send_boop' %}",
+            type: "POST",
+            data: {'boopText': $('#boopTextInput').val()},
+            success: function(data) {
+                $('#newTextModal').modal('hide')
+                $('#boopTextInput').val('')
+                window.location.href = ("{% url 'Ranker:view_boop' boop_id=1 %}").replace("1", data.boop_id)
+            }, 
+            error: function(data) {
+                $('#boopTextInput').addClass('is-invalid')
+                $('#boopTextErrorMsg').text(data.responseJSON.error_msg)
+            }
+        })
+    }
+})
+</script>
+{% endblock %}
