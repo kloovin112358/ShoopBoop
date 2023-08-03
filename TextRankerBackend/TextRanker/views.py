@@ -163,9 +163,11 @@ def sendBoop(request):
 
 
 def viewBoop(request, boop_id):
+    print("here")
     boopInst = get_object_or_404(Boop, pk=boop_id)
     rank = Boop.objects.filter(num_foops__gt=boopInst.num_foops).count()
     totalNumBoops = Boop.objects.all().count()
+    print("here1")
     rankFraction = rank / totalNumBoops
     if rankFraction < (1 / 3):
         rankColor = "bg-success"
@@ -218,4 +220,5 @@ def sendReport(request):
 
 
 def aboutPage(request):
+    testObj = get_object_or_404(Boop, pk=1)
     return render(request, "about.html")
