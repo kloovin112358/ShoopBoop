@@ -163,11 +163,9 @@ def sendBoop(request):
 
 
 def viewBoop(request, boop_id):
-    print("here")
     boopInst = get_object_or_404(Boop, pk=boop_id)
     rank = Boop.objects.filter(num_foops__gt=boopInst.num_foops).count()
     totalNumBoops = Boop.objects.all().count()
-    print("here1")
     rankFraction = rank / totalNumBoops
     if rankFraction < (1 / 3):
         rankColor = "bg-success"
@@ -179,7 +177,6 @@ def viewBoop(request, boop_id):
     viewBoopLink = request.build_absolute_uri(
         reverse("Ranker:view_boop", kwargs={"boop_id": boopInst.id})
     )
-    print("here2")
     return render(
         request,
         "boop_direct.html",
