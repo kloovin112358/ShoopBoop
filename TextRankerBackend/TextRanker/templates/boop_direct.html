@@ -8,9 +8,10 @@
 {% block content %}
 <div class="container">
     <div class="py-3 py-md-4">
-        <button class="btn btn-lg btn-outline-secondary mt-0 mt-lg-1 mb-2" id="allBoopsLink"><i class="bi bi-arrow-left"></i> All Boops</button>
+        <button class="btn btn-lg btn-outline-secondary mt-1 d-md-inline-block d-none mb-2 allBoopsLink"><i class="bi bi-arrow-left"></i> All Boops</button>
+        <button class="btn btn-sm btn-outline-secondary d-md-none allBoopsLink mb-1"><i class="bi bi-arrow-left"></i> All Boops</button>
         <div class="card shadow-lg">
-            <div class="card-body m-3">
+            <div class="card-body m-1 m-md-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                     <h1 class="mb-0"><span class="badge rounded-pill bg-primary">{{boop.num_foops}} <span class="fw-normal">foops</span></span></h1>
@@ -20,9 +21,11 @@
                     </div>
                 </div>
                 <hr>
-                <p class="display-4 mb-4 fw-bold lh-sm">"{{boop.boop_text}}"</p>
+                <p class="display-4 mb-4 fw-bold lh-sm d-md-inline-block d-none">"{{boop.boop_text}}"</p>
+                <p class="mb-4 fw-bold lh-sm d-md-none" style="font-size:1.2rem;">"{{boop.boop_text}}"</p>
                 <div class="d-flex justify-content-between align-items-center">
-                    <span class="lead fst-italic" style="font-size:2rem;">Shooped {{boop.creation_ts|date}}</span>
+                    <span class="lead fst-italic d-md-block d-none" style="font-size:2rem;">Shooped {{boop.creation_ts|date}}</span>
+                    <span class="lead fst-italic d-md-none" style="font-size:1.2rem;">Shooped {{boop.creation_ts|date}}</span>
                     <button class="btn btn-warning text-white voteBtn" boopText="{{boop.boop_text}}" foopNum="{{boop.num_foops}}">
                         <i class="bi bi-egg-fill" style="font-size: 1 rem;"></i>
                     </button>
@@ -147,7 +150,7 @@ copiedTooltip.disable()
 // synthetic link that checks for homepage referrer. If the linking page was the homepage, we don't want 
 // to send the user to the full link; we want to simulate clicking the "back" button. This is because
 // of the background loading and scrolling on the homepage. We want them to keep their place on the page.
-$('#allBoopsLink').on('click', function() {
+$('.allBoopsLink').on('click', function() {
     if (document.referrer == "{{homeLink}}") {
         history.back();
     } else {
