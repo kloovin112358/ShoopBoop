@@ -179,6 +179,7 @@ def viewBoop(request, boop_id):
     viewBoopLink = request.build_absolute_uri(
         reverse("Ranker:view_boop", kwargs={"boop_id": boopInst.id})
     )
+    print("here2")
     return render(
         request,
         "boop_direct.html",
@@ -220,5 +221,4 @@ def sendReport(request):
 
 
 def aboutPage(request):
-    testObj = get_object_or_404(Boop, pk=1)
     return render(request, "about.html")
