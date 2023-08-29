@@ -17,4 +17,3 @@ class BoopAdmin(admin.ModelAdmin):
 
 admin.site.register(BoopReport)
 admin.site.register(UserPOSTSubmissionWarning)
-admin.site.register(UserPOSTSubmission)
